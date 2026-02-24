@@ -3,77 +3,78 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"  
+  provider = "postgresql"
 }
 
 model User {
-  id    Int    @id @default(autoincrement()) 
-  email String @unique
-  password String
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
 }
 
 model Customer {
-  id              Int      @id @default(autoincrement())
-  isPerson        Boolean  
-  firstName       String?   
-  lastName        String?   
-  companyName     String?   
-  vatNumber       String?
-  email           String
-  phone           String
-  billingAddress  String
-  billingPostal   String
-  billingCity     String
-  orders          Order[]
+  id             Int     @id @default(autoincrement())
+  isPerson       Boolean
+  firstName      String?
+  lastName       String?
+  companyName    String?
+  vatNumber      String?
+  email          String
+  phone          String
+  billingAddress String
+  billingPostal  String
+  billingCity    String
+  orders         Order[]
 
-  deliveryAddresses DeliveryAddress[]  
-  contactPersons     ContactPerson[]
-  createdAt       DateTime @default(now())
+  deliveryAddresses DeliveryAddress[]
+  contactPersons    ContactPerson[]
+  createdAt         DateTime          @default(now())
 
   @@unique([firstName, lastName, email], name: "unique_private_person")
-
   @@unique([companyName, vatNumber], name: "unique_company")
 }
 
 model ContactPerson {
-  id              Int      @id @default(autoincrement())
-  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  customerId      Int
-  firstName       String
-  lastName        String
-  email           String
-  phone           String
-  isPrimary       Boolean  @default(false)
+  id         Int      @id @default(autoincrement())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  customerId Int
+  firstName  String
+  lastName   String
+  email      String
+  phone      String
+  isPrimary  Boolean  @default(false)
+  orders     Order[]
 }
 
 model DeliveryAddress {
-  id              Int      @id @default(autoincrement())
-  customer        Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId      Int
-  address         String
-  postalCode      String
-  city            String
-  isDefault       Boolean @default(false)
-  orders          Order[]
+  id         Int      @id @default(autoincrement())
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId Int
+  address    String
+  postalCode String
+  city       String
+  isDefault  Boolean  @default(false)
+  orders     Order[]
 }
 
 model ProductType {
-id                Int         @id @default(autoincrement())
-name              String      @unique
-products Product[]
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
 }
 
 model Product {
-  id              Int         @id @default(autoincrement())
-  nobbnr          String      @unique
-  description     String
-  price           Decimal @db.Decimal(10,2)
-  unit            Unit
-  meterPerSquare  Float?
-  productTypeId   Int
-  productType     ProductType @relation(fields: [productTypeId], references: [id])
-  createdAt                   DateTime @default(now())
+  id             Int         @id @default(autoincrement())
+  nobbnr         String      @unique
+  description    String
+  price          Decimal     @db.Decimal(10, 2)
+  unit           Unit
+  meterPerSquare Float?
+  productTypeId  Int
+  productType    ProductType @relation(fields: [productTypeId], references: [id])
+  orderLines     OrderLine[]
+  createdAt      DateTime    @default(now())
 
   @@index([productTypeId])
 }
@@ -82,30 +83,31 @@ enum Unit {
   LM
   STK
   M2
-  PAK  
+  PAK
 }
 
 model Order {
-  id                  Int         @id @default(autoincrement())
-  ordreNr             Int 
-  bestNr              String
-  customerId          Int
-  customer            Customer @relation(fields: [customerId], references: [id])  
-  deliveryAddressId   Int
-  deliveryAddress     DeliveryAddress  @relation(fields: [deliveryAddressId], references: [id])
-  contactPersonId     Int? 
-  contactPerson       ContactPerson? @relation(fields: [contactPersonId], references: [id])
-  createdAt                   DateTime @default(now())
+  id                Int             @id @default(autoincrement())
+  ordreNr           Int
+  bestNr            String
+  customerId        Int
+  customer          Customer        @relation(fields: [customerId], references: [id])
+  deliveryAddressId Int
+  deliveryAddress   DeliveryAddress @relation(fields: [deliveryAddressId], references: [id])
+  contactPersonId   Int?
+  contactPerson     ContactPerson?  @relation(fields: [contactPersonId], references: [id])
+  orderLines        OrderLine[]
+  createdAt         DateTime        @default(now())
 }
 
 model OrderLine {
-  id                  Int         @id @default(autoincrement())
-  orderId             Int
-  order               Order       @relation(fields: [orderId], references: [id])
-  productId           Int
-  product             ProductType @relation(fields: [productId], references: [id])
-  priceLine           Decimal @db.Decimal(10,2)  
-  discount            Decimal? @db.Decimal(5,2)
-  quantity            Decimal @db.Decimal(10,2) 
-  vatRate             Decimal? @db.Decimal(4,2)
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  priceLine Decimal  @db.Decimal(10, 2)
+  discount  Decimal? @db.Decimal(5, 2)
+  quantity  Decimal  @db.Decimal(10, 2)
+  vatRate   Decimal? @db.Decimal(4, 2)
 }
