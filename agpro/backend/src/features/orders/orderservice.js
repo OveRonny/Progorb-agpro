@@ -27,46 +27,40 @@ export async function createOrderService(data) {
     if (!data.deliveryAddressId) throw new Error("Missing deliveryAddressId");
     if (!data.orderLines || !Array.isArray(data.orderLines))
         throw new Error("Missing orderLines array");
-    return prisma.$transaction(async (prismaTx) => {
-        const order = await prismaTx.order.create({
-            data: {
-                ordreNr: data.ordreNr,
-                bestNr: data.bestNr,
-                customerId: data.customerId,
-                deliveryAddressId: data.deliveryAddressId,
-                contactPersonId: data.contactPersonId ?? null,
-                orderLines: {
-                    create: data.orderLines.map(line => ({
-                        productId: line.productId,
-                        priceLine: line.priceLine,
-                        discount: line.discount ?? 0,
-                        quantity: line.quantity,
-                        vatRate: line.vatRate ?? 25
-                    }))
+
+    try {
+        return await prisma.$transaction(async (prismaTx) => {
+            const order = await prismaTx.order.create({
+                data: {
+                    ordreNr: data.ordreNr,
+                    bestNr: data.bestNr,
+                    customerId: data.customerId,
+                    deliveryAddressId: data.deliveryAddressId,
+                    contactPersonId: data.contactPersonId ?? null,
+                    orderLines: {
+                        create: data.orderLines.map(line => ({
+                            productId: line.productId,
+                            priceLine: line.priceLine,
+                            discount: line.discount ?? 0,
+                            quantity: line.quantity,
+                            vatRate: line.vatRate ?? 25
+                        }))
+                    }
+                },
+                include: {
+                    orderLines: true,
+                    customer: true,
+                    deliveryAddress: true,
+                    contactPerson: true
                 }
-            },
-            include: {
-                orderLines: true,
-                customer: true,
-                deliveryAddress: true,
-                contactPerson: true
-            }
+            });
+
+            return order;
         });
-
-        return order;
-    });
+    } catch (err) {
+        console.error("Order creation failed, rolling back", err);        
+        return null;
+    }
 }
 
-async function getOrderById(prismaClient, id) {
-    return prismaClient.order.findUnique({
-        where: {
-            id
-        },
-        include: {
-            orderLines: true,
-            customer: true,
-            deliveryAddress: true,
-            contactPerson: true
-        }
-    });
-}
+

@@ -23,36 +23,40 @@ import {
 export const ProductController = {
 
     async showProducts() {
-        const appDiv = document.getElementById('app');
+        const appDiv = document.getElementById("app");
+        appDiv.innerHTML = "";
+
         try {
             const products = await ProductModel.getProducts();
-            appDiv.innerHTML = ProductFormView.render() + ProductListView.render(products) 
-            + ProductTypeModalView.render();
-            
-            await ProductFormView.loadUnits();
 
-            const productTypes = await ProductTypeModel.getAll();
+            const productFormView = ProductFormView.render();
+            appDiv.appendChild(productFormView);
+
+            const productListView = ProductListView.render(products);
+            appDiv.appendChild(productListView);
+
+            await ProductFormView.loadUnits();
             await ProductFormView.fillProductTypes(() => {
-                ProductTypeController.openModal();
+                console.log("Legg til ny produkt type!");
             });
-            ProductTypeController.setupModal();
-           
+
             this.setupForm();
             this.setupEditButtons(products);
-            this.setupDeleteButtons(products);
-           
-        } catch (err) {
+            this.setupDeleteButtons();
+        } catch (error) {
             appDiv.innerHTML = `<p style="color:red">${err.message}</p>
                             <button id="go-login">Go to Login</button>`;
             document.getElementById('go-login').addEventListener('click', () => {
                 AppController.showLogin();
             });
         }
+
     },
 
     setupForm() {
         const toggleBtn = document.getElementById('toggle-product-form');
         const formContainer = document.getElementById('product-form');
+
 
         toggleBtn.addEventListener('click', () => {
             formContainer.classList.toggle('hidden');
@@ -60,7 +64,7 @@ export const ProductController = {
 
         formContainer.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = formContainer.dataset.id;
+            const id = document.getElementById('product-form').dataset.id || '';
             const productData = {
                 nobbnr: document.getElementById('nobbnr').value,
                 description: document.getElementById('description').value,
@@ -87,7 +91,9 @@ export const ProductController = {
         document.querySelectorAll('.edit-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
+
                 const product = products.find(p => p.id == id);
+                if (!product) return;
                 this.fillForm(product);
             });
         });

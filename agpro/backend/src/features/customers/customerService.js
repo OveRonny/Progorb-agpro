@@ -19,7 +19,7 @@ export async function getCustomerByIdService(id) {
 }
 
 export async function createCustomerService(data) {
-  return prisma.$transaction(async (prismaTx) => {    
+  return prisma.$transaction(async (prismaTx) => {
     const customer = await prismaTx.customer.create({
       data: {
         isPerson: data.isPerson,
@@ -36,11 +36,11 @@ export async function createCustomerService(data) {
     });
 
     const customerId = customer.id;
-    
+
     await createDeliveryAddresses(prismaTx, customerId, data.deliveryAddresses || []);
-    
+
     await createContactPersons(prismaTx, customerId, data.contactPersons || []);
-    
+
     return prismaTx.customer.findUnique({
       where: {
         id: customerId
@@ -81,10 +81,10 @@ async function createContactPersons(prismaTx, customerId, persons) {
   }
 }
 
-export async function updateCustomerService(id, data) {   
-  return prisma.$transaction(async (prismaTx) => {    
+export async function updateCustomerService(id, data) {
+  return prisma.$transaction(async (prismaTx) => {
     const customer = await prismaTx.customer.update({
-      
+
       where: {
         id
       },
@@ -101,12 +101,12 @@ export async function updateCustomerService(id, data) {
         billingCity: data.billingCity
       }
     });
-    
-    
+
+
     await syncDeliveryAddresses(prismaTx, id, data.deliveryAddresses || []);
-    
+
     await syncContactPersons(prismaTx, id, data.contactPersons || []);
-    
+
     return prismaTx.customer.findUnique({
       where: {
         id
@@ -119,24 +119,41 @@ export async function updateCustomerService(id, data) {
   });
 }
 
-async function syncDeliveryAddresses(prismaTx, customerId, addresses) {  
+async function syncDeliveryAddresses(prismaTx, customerId, addresses) {
+  for (const addr of addresses) {
+    const ordersUsing = await prismaTx.order.findFirst({
+      where: {
+        deliveryAddressId: addr.id
+      }
+    });
+
+    if (!ordersUsing) {
+      await prismaTx.deliveryAddress.delete({
+        where: {
+          id: addr.id
+        }
+      });
+    } else {
+      console.warn(`Kan ikke slette DeliveryAddress ${addr.id}, brukes av ordre ${ordersUsing.id}`);
+    }
+  }
   await prismaTx.deliveryAddress.deleteMany({
     where: {
       customerId,
       id: {
         notIn: addresses.filter(a => a.id).map(a => a.id)
-        
+
       }
     }
   });
-  
+
   for (const addr of addresses) {
     if (addr.id) {
       await prismaTx.deliveryAddress.update({
         where: {
           id: addr.id
         },
-        data: {          
+        data: {
           address: addr.address,
           postalCode: addr.postalCode,
           city: addr.city
@@ -144,7 +161,7 @@ async function syncDeliveryAddresses(prismaTx, customerId, addresses) {
       });
     } else {
       await prismaTx.deliveryAddress.create({
-        data: {         
+        data: {
           customerId,
           address: addr.address,
           postalCode: addr.postalCode,

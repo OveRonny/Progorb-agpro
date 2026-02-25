@@ -1,0 +1,43 @@
+export const OrderFormView = {
+    render() { `
+        <form id="order-form">
+            <h2>Ordre</h2>
+
+            <label>Kunde</label>
+            <select id="customer" required></select>
+
+            <label>Ordrenummer</label>
+            <input type="number" id="ordreNr" readonly placeholder="Genereres automatisk">
+
+            <label>Bestillingsnummer</label>
+            <input type="text" id="bestNr">
+
+            <label>Leveringsadresse</label>
+            <select id="deliveryAddress" required></select>
+
+            <label>Kontaktperson</label>
+            <select id="contactPerson">
+                <option value="">Ingen</option>
+            </select>
+
+            <h3>Ordrelinjer</h3>
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>Produkt</th>
+                        <th>Antall</th>
+                        <th>Pris</th>
+                        <th>Handling</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button type="button" id="add-order-line">Legg til linje</button>
+
+            <button type="submit">Lagre ordre</button>
+        </form>
+        
+        `;
+
+    }
+}

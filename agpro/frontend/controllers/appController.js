@@ -7,6 +7,7 @@ import {
 import { CustomerController } from '../features/customers/controllers/customerController.js';
 import { ProductController } from '../features/products/controllers/productController.js';
 import { ProductTypeController } from '../features/productTypes/controllers/productTypeController.js';
+import { OrderController } from '../features/orders/controllers/orderController.js';
 
 export const AppController = {
     start() {
@@ -36,5 +37,9 @@ export const AppController = {
 
     showProductTypes() {
         ProductTypeController.showProductTypes();
+    },
+    
+    showOrders() {
+        OrderController.showOrders();
     }
 };

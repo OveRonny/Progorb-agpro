@@ -40,6 +40,7 @@ export const Header = {
                 <button id="nav-customers" class="nav-btn">Customers</button>
                 <button id="nav-products" class="nav-btn">Products</button>
                 <button id="nav-products-type" class="nav-btn">Produkt typer</button>
+                <button id="nav-orders" class="nav-btn">Ordrer</button>
             `;
 
             right.innerHTML = `
@@ -54,6 +55,9 @@ export const Header = {
 
             document.getElementById('nav-products-type')
             .addEventListener('click', () => AppController.showProductTypes());
+
+            document.getElementById('nav-orders')
+            .addEventListener('click', () => AppController.showOrders());
 
             document.getElementById('nav-logout')
                 .addEventListener('click', () => {

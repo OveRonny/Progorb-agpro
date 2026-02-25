@@ -1,59 +1,87 @@
 export const CustomerListView = {
-    render(customers) {
-        if (!customers || customers.length === 0) {
-            return `<p>No customers found.</p>`;
-        }
+  render(customers) {
+    const container = document.createElement("div"); 
 
-        // Lag tabellrader
-        const rows = customers.map(c => {
-            const name = c.isPerson
-                ? `${c.firstName} ${c.lastName}`
-                : c.companyName;
-
-            const vat = c.isPerson ? '-' : c.vatNumber || '-';
-            const email = c.email || '-';
-            const phone = c.phone || '-';
-            const address = c.billingAddress || '-';
-            const postal = c.billingPostal || '-';
-            const city = c.billingCity || '-';
-
-            return `
-                <tr>
-                    <td>${name}</td>
-                    <td>${vat}</td>
-                    <td>${email}</td>
-                    <td>${phone}</td>
-                    <td>${address}</td>
-                    <td>${postal}</td>
-                    <td>${city}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${c.id}">Edit</button>
-                        <button class="delete-btn" data-id="${c.id}">Delete</button>
-                    </td>       
-                </tr>
-            `;
-        }).join('');
-
-        return `
-            <h2>Kunder</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name / Company</th>
-                        <th>VAT Number</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>Postal</th>
-                        <th>City</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-            
-        `;
+    if (!customers || customers.length === 0) {
+      const noCustomers = document.createElement("p");
+      noCustomers.textContent = "No customers found.";
+      container.appendChild(noCustomers);
+      return container; // ⚠ DOM-node
     }
+   
+    const title = document.createElement("h2");
+    title.textContent = "Kunder";
+    container.appendChild(title);
+
+    const table = document.createElement("table");
+    
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    const headers = [
+      "Name / Company",
+      "VAT Number",
+      "Email",
+      "Phone",
+      "Address",
+      "Postal",
+      "City",
+      "Actions"
+    ];
+
+    headers.forEach(text => {
+      const th = document.createElement("th");
+      th.textContent = text;
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    const tbody = document.createElement("tbody");
+
+    customers.forEach(c => {
+      const tr = document.createElement("tr");
+
+      const name = c.isPerson ? `${c.firstName} ${c.lastName}` : c.companyName;
+      const vat = c.isPerson ? "-" : c.vatNumber || "-";
+      const email = c.email || "-";
+      const phone = c.phone || "-";
+      const address = c.billingAddress || "-";
+      const postal = c.billingPostal || "-";
+      const city = c.billingCity || "-";
+
+      const values = [name, vat, email, phone, address, postal, city];
+
+      values.forEach(v => {
+        const td = document.createElement("td");
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      
+      const actionsTd = document.createElement("td");
+
+      const editBtn = document.createElement("button");
+      editBtn.classList.add("edit-btn");
+      editBtn.dataset.id = c.id;
+      editBtn.textContent = "Edit";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.classList.add("delete-btn");
+      deleteBtn.dataset.id = c.id;
+      deleteBtn.textContent = "Delete";
+
+      actionsTd.appendChild(editBtn);
+      actionsTd.appendChild(deleteBtn);
+
+      tr.appendChild(actionsTd);
+
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    container.appendChild(table);
+
+    return container; 
+  }
 };

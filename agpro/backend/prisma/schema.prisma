@@ -37,7 +37,7 @@ model Customer {
 
 model ContactPerson {
   id         Int      @id @default(autoincrement())
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId Int
   firstName  String
   lastName   String
@@ -45,6 +45,7 @@ model ContactPerson {
   phone      String
   isPrimary  Boolean  @default(false)
   orders     Order[]
+  @@index([customerId])
 }
 
 model DeliveryAddress {
@@ -54,8 +55,9 @@ model DeliveryAddress {
   address    String
   postalCode String
   city       String
-  isDefault  Boolean  @default(false)
-  orders     Order[]
+  isDefault  Boolean  @default(false) 
+
+  @@index([customerId])
 }
 
 model ProductType {
@@ -91,11 +93,13 @@ model Order {
   ordreNr           Int
   bestNr            String
   customerId        Int
-  customer          Customer        @relation(fields: [customerId], references: [id])
-  deliveryAddressId Int
-  deliveryAddress   DeliveryAddress @relation(fields: [deliveryAddressId], references: [id])
+  customer          Customer        @relation(fields: [customerId], references: [id]) 
   contactPersonId   Int?
   contactPerson     ContactPerson?  @relation(fields: [contactPersonId], references: [id])
+  deliveryName      String
+  deliveryAddress   String
+  deliveryPostal    String
+  deliveryCity      String
   orderLines        OrderLine[]
   createdAt         DateTime        @default(now())
 }
@@ -110,4 +114,5 @@ model OrderLine {
   discount  Decimal? @db.Decimal(5, 2)
   quantity  Decimal  @db.Decimal(10, 2)
   vatRate   Decimal? @db.Decimal(4, 2)
+  @@index([orderId])
 }

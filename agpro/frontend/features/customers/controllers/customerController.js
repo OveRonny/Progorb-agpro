@@ -14,18 +14,25 @@ import {
 export const CustomerController = {
 
     async showCustomers() {
-        const appDiv = document.getElementById('app');
+        const appDiv = document.getElementById("app");
+        appDiv.innerHTML = ""; // Tømmer gamle views
+
         try {
             const customers = await CustomerModel.getCustomers();
+            
+            const customerFormView = CustomerFormView.render();
+            appDiv.appendChild(customerFormView);
+            
+            const customerListView = CustomerListView.render(customers);
+            appDiv.appendChild(customerListView); 
 
-            appDiv.innerHTML = CustomerFormView.render() + CustomerListView.render(customers);
-
+            
             this.setupForm();
             this.setupEditButtons(customers);
-            this.setupDeleteButtons(customers);
+            this.setupDeleteButtons();
         } catch (err) {
             appDiv.innerHTML = `<p style="color:red">${err.message}</p>
-                                <button id="go-login">Go to Login</button>`;
+                            <button id="go-login">Go to Login</button>`;
             document.getElementById('go-login').addEventListener('click', () => {
                 AppController.showLogin();
             });
@@ -56,8 +63,8 @@ export const CustomerController = {
             });
         });
 
-        document.getElementById('add-customer-form')
-            .addEventListener('submit', async (e) => {
+     
+            formContainer.addEventListener('submit', async (e) => {
 
                 e.preventDefault();
 
@@ -86,7 +93,7 @@ export const CustomerController = {
                         await CustomerModel.addCustomer(customerData);
                     }
 
-                    this.showCustomers(); 
+                    await this.showCustomers();
                 } catch (err) {
                     alert(err.message);
                 }
@@ -114,7 +121,7 @@ export const CustomerController = {
 
                 try {
                     await CustomerModel.deleteCustomer(id);
-                    this.showCustomers(); // reload etter sletting
+                    this.showCustomers(); 
                 } catch (err) {
                     alert(err.message);
                 }
@@ -126,7 +133,7 @@ export const CustomerController = {
     fillForm(customer) {
         document.getElementById('customerId').value = customer.id;
 
-        const formContainer = document.getElementById('customer-form-container');
+        const formContainer = document.getElementById('add-customer-form');
         formContainer.style.display = '';
 
         if (customer.isPerson) {
@@ -148,8 +155,8 @@ export const CustomerController = {
         document.getElementById('billingAddress').value = customer.billingAddress || '';
         document.getElementById('billingPostal').value = customer.billingPostal || '';
         document.getElementById('billingCity').value = customer.billingCity || '';
-
-        document.getElementById('submit-btn').textContent = "Update Customer";
+        document.getElementById('submit-btn').textContent = "Oppdater";
+        formContainer.classList.remove('hidden');
     }
 
 };
