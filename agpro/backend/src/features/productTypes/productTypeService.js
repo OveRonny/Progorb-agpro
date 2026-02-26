@@ -1,6 +1,7 @@
 import {
   prisma
 } from '../prisma/client.js';
+import  Result from "../helpers/result.js"
 
 export async function getProductTypesService() {
   return prisma.productType.findMany({});
@@ -15,10 +16,28 @@ export async function getProductTypeByIdService(id) {
 }
 
 export async function createProductTypeService(data) {
-  return prisma.productType.create({
-    data: {
-        name: data.name    }
-  });
+    try {        
+        const newType = await prisma.productType.create({
+            data: { name: data.name }
+        });
+        return Result.success(newType);
+
+    } catch (err) {       
+        if (err.code === 'P2002') {
+            
+            try {
+                const existing = await prisma.productType.findUnique({
+                    where: { name: data.name }
+                });
+                if (existing) {
+                    return Result.alreadyExists(existing);
+                }
+            } catch {                
+                return Result.failure("ProduktType finnes allerede");
+            }
+        }        
+        return Result.failure(err.message);
+    }
 }
 
 export async function updateProductTypeService(id, data) {

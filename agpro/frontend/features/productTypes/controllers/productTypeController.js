@@ -21,12 +21,11 @@ export const ProductTypeController = {
         try {
             const productTypes = await ProductTypeModel.getAll();
             appDiv.innerHTML = ProductTypeFormView.render() +
-                ProductTypeListView.render(productTypes) +
-                ProductTypeModalView.render();
+                ProductTypeListView.render(productTypes);
+                
             this.setupEditButtons(productTypes);
             this.setupDeleteButtons(productTypes);
-            this.setupForm();
-            this.setupModal();
+            this.setupForm();           
         } catch (err) {
             appDiv.innerHTML = `<p style="color:red">${err.message}</p>
                                 <button id="go-login">Go to Login</button>`;
@@ -45,7 +44,7 @@ export const ProductTypeController = {
         });
 
         formContainer.addEventListener('submit', async (e) => {
-             e.preventDefault();
+            e.preventDefault();
             const id = formContainer.dataset.id;
             const productData = {
                 name: document.getElementById('name').value
@@ -99,58 +98,5 @@ export const ProductTypeController = {
         formContainer.classList.remove('hidden');
     },
 
-    openModal() {
-        const modal = document.getElementById('productTypeModal');
-        modal.showModal();
-    },
 
-    closeModal() {
-        const modal = document.getElementById('productTypeModal');
-        modal.close();
-    },
-
-    setupModal() {
-        const modal = document.getElementById('productTypeModal');
-        const openBtn = document.getElementById('openProductTypeModal');
-        const closeBtn = document.getElementById('closeModal');
-        const form = document.getElementById('productTypeForm');
-
-        if (!modal) return;
-
-        openBtn?.addEventListener('click', () => this.openModal());
-        closeBtn?.addEventListener('click', () => this.closeModal());
-
-        form?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const nameInput = document.getElementById('productTypeName');
-            const name = nameInput.value.trim();
-
-            if (!name) return;
-
-            try {
-                const newProductType = await ProductTypeModel.create({
-                    name
-                });
-
-                const select = document.getElementById('productType');
-
-                if (select) {
-                    const option = document.createElement('option');
-                    option.value = newProductType.id;
-                    option.textContent = newProductType.name;
-
-                    select.appendChild(option);
-                    select.value = newProductType.id;
-                }
-
-                form.reset();
-
-                this.closeModal();
-
-            } catch (err) {
-                alert('Error creating product type: ' + err.message);
-            }
-        });
-    }
-};
+}

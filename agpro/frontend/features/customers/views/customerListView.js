@@ -6,7 +6,7 @@ export const CustomerListView = {
       const noCustomers = document.createElement("p");
       noCustomers.textContent = "No customers found.";
       container.appendChild(noCustomers);
-      return container; // ⚠ DOM-node
+      return container; 
     }
    
     const title = document.createElement("h2");

@@ -10,6 +10,7 @@ import {
     deleteProductTypeService
 } from "./productTypeService.js";
 
+
 export const getProductTypes = handleAsync(async (req, res) => {
     const productTypes = await getProductTypesService();
     res.json(productTypes);
@@ -27,9 +28,19 @@ export const getProductTypeById = handleAsync(async (req, res) => {
 });
 
 export const createProductType = handleAsync(async (req, res) => {
-    const data = req.body;
-    const newProductType = await createProductTypeService(data);
-    res.status(201).json(newProductType);
+    const data = req.body;    
+    const result = await createProductTypeService(data);
+
+    if (result.status === "success") {
+        return res.status(201).json(result);          
+    }
+
+    if (result.status === "alreadyExists") {
+        return res.status(200).json(result);          
+    }
+
+    
+    return res.status(400).json(result);
 });
 
 export const updateProductType = handleAsync(async (req, res) => {

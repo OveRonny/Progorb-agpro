@@ -19,7 +19,7 @@ model Customer {
   firstName      String?
   lastName       String?
   companyName    String?
-  vatNumber      String?
+  vatNumber      String?  @unique
   email          String
   phone          String
   billingAddress String
@@ -90,7 +90,7 @@ enum Unit {
 
 model Order {
   id                Int             @id @default(autoincrement())
-  ordreNr           Int
+  ordreNr           Int             @unique
   bestNr            String
   customerId        Int
   customer          Customer        @relation(fields: [customerId], references: [id]) 
