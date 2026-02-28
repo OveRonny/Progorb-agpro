@@ -44,3 +44,14 @@ export async function loginUser({ email, password }) {
   // Returner token + evt brukerinfo
   return { token, user: { id: user.id, email: user.email, name: user.name } };
 }
+
+export async function getProfileService(userId) {
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    select: { id: true, email: true }
+  });
+
+  if (!user) throw new Error('User not found'); // kast feil, controller håndterer respons
+
+  return user;
+}

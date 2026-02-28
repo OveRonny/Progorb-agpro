@@ -23,6 +23,7 @@ export async function createCustomerService(data) {
     const customer = await prismaTx.customer.create({
       data: {
         isPerson: data.isPerson,
+        customerNumber: data.customerNumber,
         firstName: data.isPerson ? data.firstName : null,
         lastName: data.isPerson ? data.lastName : null,
         companyName: data.isPerson ? null : data.companyName,
@@ -90,6 +91,7 @@ export async function updateCustomerService(id, data) {
       },
       data: {
         isPerson: data.isPerson,
+        customerNumber: data.customerNumber,
         firstName: data.isPerson ? data.firstName : null,
         lastName: data.isPerson ? data.lastName : null,
         companyName: data.isPerson ? null : data.companyName,
