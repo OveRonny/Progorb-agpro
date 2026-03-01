@@ -5,36 +5,57 @@ import {
 import {
   useUserStore
 } from '../features/users/store.js'
-
+import LoginPage from '../features/users/views/LoginPage.vue'
+import RegisterPage from '../features/users/views/RegisterPage.vue'
+import DashboardPage from '../features/dashboard/views/HomePage.vue'
+import CustomersPage from '../features/customers/views/CustomersPage.vue'
+import ProductPage from '../features/products/views/ProductPage.vue'
+import ProductTypePage from '../features/productTypes/views/ProductTypePage.vue'
 
 export const routes = [{
     path: '/login',
-    component: () => import('../features/users/views/LoginPage.vue'),
+    component: LoginPage,
     name: 'Login'
   },
   {
     path: '/register',
-    component: () => import('../features/users/views/RegisterPage.vue'),
+    component: RegisterPage,
     name: 'Register'
   },
   {
     path: '/',
-    component: () => import('../features/dashboard/views/HomePage.vue'),
+    component: DashboardPage,
     name: 'Dashboard',
     meta: {
       requiresAuth: true
     }
-  },  
-   {
+  },
+  {
     path: '/customers',
-    component: () => import('../features/customers/views/CustomersPage.vue'),
+    component: CustomersPage,
     name: 'Customers',
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/products',
+    component: ProductPage,
+    name: 'Products',
+    meta: {
+      requiresAuth: true
+    }
+  },
+   {
+    path: '/product-types',
+    component: ProductTypePage,
+    name: 'Product-types',
     meta: {
       requiresAuth: true
     }
   }
 
-  
+
 ]
 
 const router = createRouter({
@@ -44,16 +65,16 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const userStore = useUserStore()
-  
+
   if (userStore.token && !userStore.user) {
     try {
-      await userStore.fetchProfile() 
+      await userStore.fetchProfile()
     } catch {
       userStore.logout()
-      return '/login' 
+      return '/login'
     }
   }
-  
+
   if (to.meta.requiresAuth && !userStore.token) {
     return '/login'
   }

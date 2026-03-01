@@ -56,14 +56,17 @@ export async function deleteProductService(id) {
 }
 
 export async function getUnitsService(req, res) {
-  try {
-    const units = ["LM", "STK", "M2", "PAK"];  
-    res.json(units);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Kunne ikke hente units" });
-  }
+    try {        
+        const result = await prisma.$queryRaw `
+      SELECT unnest(enum_range(NULL::"Unit")) AS unit;
+    `
+        const units = result.map(r => r.unit)
+        res.json(units)      
+        
+    } catch (err) {
+        console.error('Feil i getUnitsService:', err)
+        res.status(500).json({
+            error: 'Kunne ikke hente units'
+        })
+    }
 }
-
-
-

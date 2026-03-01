@@ -2,7 +2,7 @@
   <nav class="bg-gray-800 p-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       
-      <!-- Venstre: Logo + lenker -->
+      
       <div class="flex items-center space-x-6">
         <div class="text-white font-bold text-lg">MinApp</div>
 
@@ -17,9 +17,9 @@
         </router-link>
       </div>
 
-      <!-- Høyre: Brukerinitial + Logout -->
+      
       <div class="flex items-center gap-4">
-        <!-- Initial -->
+        
         <div
           class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-600 text-white font-bold"
         >
@@ -46,19 +46,17 @@ import { computed } from 'vue'
 import { useUserStore } from '../features/users/store.js'
 import { useRouter } from 'vue-router'
 
-// Pinia store
+
 const userStore = useUserStore()
 const router = useRouter()
 
 
-
-// Logout funksjon
 const logout = () => {
   userStore.logout()
   router.push('/login')
 }
 
-// Filter ruter (Dashboard + Customers)
+
 const props = defineProps({
   routes: {
     type: Array,
@@ -67,7 +65,8 @@ const props = defineProps({
 })
 
 const navRoutes = computed(() =>
-  props.routes.filter(r => r.name === 'Dashboard' || r.name === 'Customers')
+  props.routes.filter(r => r.name === 'Dashboard' || r.name === 'Customers' 
+  || r.name === 'Products' || r.name === 'Product-types')
 )
 
 const userInitial = computed(() => userStore.user?.email?.charAt(0).toUpperCase() || '?')

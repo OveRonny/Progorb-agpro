@@ -3,6 +3,7 @@
     
     <Navbar v-if="userStore.token" :routes="routes" />    
     <router-view />
+    <AppModal />
   </div>
 </template>
 
@@ -11,6 +12,7 @@ import Navbar from './components/Navbar.vue'
 import { useUserStore } from './features/users/store.js'
 import { routes } from './router'
 import { ref, onMounted } from 'vue'
+import AppModal from './components/AppModal.vue'
 
 const userStore = useUserStore()
 
